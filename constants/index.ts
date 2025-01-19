@@ -148,3 +148,44 @@ export const sampleBooks = [
       "Morgan Housel explores the unique behaviors and mindsets that shape financial success and decision-making.",
   },
 ];
+export const navigationLinks = [
+  {
+    href: "/library",
+    label: "Library",
+  },
+
+  {
+    img: "/icons/user.svg",
+    selectedImg: "/icons/user-fill.svg",
+    href: "/my-profile",
+    label: "My Profile",
+  },
+];
+
+export const adminSideBarLinks = [
+  {
+    img: "/icons/admin/home.svg",
+    route: "/admin",
+    text: "Home",
+  },
+  {
+    img: "/icons/admin/users.svg",
+    route: "/admin/users",
+    text: "All Users",
+  },
+  {
+    img: "/icons/admin/book.svg",
+    route: "/admin/books",
+    text: "All Books",
+  },
+  {
+    img: "/icons/admin/bookmark.svg",
+    route: "/admin/borrow-records",
+    text: "Borrow Records",
+  },
+  {
+    img: "/icons/admin/user.svg",
+    route: "/admin/account-requests",
+    text: "Account Requests",
+  },
+];
