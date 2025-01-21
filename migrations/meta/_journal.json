@@ -15,6 +15,13 @@
       "when": 1737309520435,
       "tag": "0001_careful_zombie",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1737424212188,
+      "tag": "0002_organic_kabuki",
+      "breakpoints": true
     }
   ]
 }
