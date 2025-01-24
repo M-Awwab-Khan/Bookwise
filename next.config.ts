@@ -11,7 +11,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "m.media-amazon.com",
       },
+      {
+        protocol: "https",
+        hostname: "placholder.co",
+      },
     ],
+    dangerouslyAllowSVG: true,
   },
   typescript: {
     ignoreBuildErrors: true,
