@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { Trash2, ExternalLink } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,52 +11,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import RoleSwitcher from "@/components/admin/RoleSwitcher";
+import { fetchUsers } from "@/lib/actions/admin";
+import { format } from "date-fns";
 
-// This would typically come from your database
-const users = [
-  {
-    id: 1,
-    name: "Darrell Steward",
-    email: "darrellsteward@gmail.com",
-    dateJoined: "Dec 19 2023",
-    role: "User",
-    booksBorrowed: 10,
-    universityId: "90224423789",
-    avatar: "/placeholder.svg",
-  },
-  {
-    id: 2,
-    name: "Marc Atanson",
-    email: "marcatanson@gmail.com",
-    dateJoined: "Dec 19 2023",
-    role: "Admin",
-    booksBorrowed: 32,
-    universityId: "90224423789",
-    avatar: "/placeholder.svg",
-  },
-  {
-    id: 3,
-    name: "Susan Drake",
-    email: "contact@susandrake.co",
-    dateJoined: "Dec 19 2023",
-    role: "User",
-    booksBorrowed: 13,
-    universityId: "90224423789",
-    avatar: "/placeholder.svg",
-  },
-];
-
-export default function UsersTable() {
-  const [tableUsers, setTableUsers] = React.useState(users);
-
-  const updateUserRole = (userId: number, newRole: string) => {
-    setTableUsers(
-      users.map((user) =>
-        user.id === userId ? { ...user, role: newRole } : user
-      )
-    );
-  };
-
+export default async function UsersTable() {
+  const usersData = await fetchUsers();
   return (
     <div className="space-y-4 bg-background rounded-lg p-6">
       <h2 className="text-xl font-semibold">All Users</h2>
@@ -76,33 +33,33 @@ export default function UsersTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tableUsers.map((user) => (
+            {usersData.map((user) => (
               <TableRow key={user.id} className="h-[70px]">
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar} alt={user.name} />
+                      {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
                       <AvatarFallback>
-                        {user.name
+                        {user.fullname
                           .split(" ")
                           .map((n) => n[0])
                           .join("")}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span>{user.name}</span>
+                      <span>{user.fullname}</span>
                       <span className="text-sm text-muted-foreground">
                         {user.email}
                       </span>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>{user.dateJoined}</TableCell>
+                <TableCell>{format(user.dateJoined, "yyyy-MM-dd")}</TableCell>
                 <TableCell>
-                  <RoleSwitcher user={user} updateUserRole={updateUserRole} />
+                  <RoleSwitcher user={user} />
                 </TableCell>
                 <TableCell>{user.booksBorrowed}</TableCell>
-                <TableCell>{user.universityId}</TableCell>
+                <TableCell>{user.university_id}</TableCell>
                 <TableCell>
                   <Button
                     variant="ghost"
