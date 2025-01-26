@@ -32,3 +32,25 @@ export const fetchBooks = async () => {
   const booksData = await db.select().from(books);
   return booksData;
 };
+
+export const fetchBorrowRecordsWithBooks = async () => {
+  const borrowRecordsData = await db
+    .select({
+      id: borrowRecords.id,
+      userId: borrowRecords.userId,
+      bookId: borrowRecords.bookId,
+      borrowedAt: borrowRecords.borrowDate,
+      returnedAt: borrowRecords.returnDate,
+      dueDate: borrowRecords.dueDate,
+      status: borrowRecords.status,
+      bookTitle: books.title,
+      coverUrl: books.coverUrl,
+      color: books.coverColor,
+      userName: users.fullname,
+      userEmail: users.email,
+    })
+    .from(borrowRecords)
+    .leftJoin(books, eq(borrowRecords.bookId, books.id))
+    .leftJoin(users, eq(borrowRecords.userId, users.id));
+  return borrowRecordsData;
+};
