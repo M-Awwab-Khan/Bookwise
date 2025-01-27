@@ -6,6 +6,8 @@ import BorrowBook from "./BorrowBook";
 import { db } from "@/database/drizzle";
 import { users } from "@/database/schema";
 import { eq } from "drizzle-orm";
+import { hasUserBorrowedBook } from "@/lib/actions/book";
+import DownloadReciept from "./DownloadReciept";
 
 interface Props extends Book {
   userId: string;
@@ -36,6 +38,7 @@ const BookOverview = async ({
         ? "Book is not available"
         : "You are not eligible to borrow this book",
   };
+  const hasBorrowed = await hasUserBorrowedBook(userId, id);
   return (
     <section className="book-overview">
       <div className="flex flex-1 flex-col gap-5">
@@ -62,13 +65,14 @@ const BookOverview = async ({
           </p>
         </div>
         <p className="book-description">{description}</p>
-        {user && (
+        {user && !hasBorrowed && (
           <BorrowBook
             userId={userId}
             bookId={id}
             borrowingEligibility={borrowingEligibility}
           />
         )}
+        {hasBorrowed && <DownloadReciept borrowId={"123"} />}
       </div>
       <div className="relative flex flex-1 justify-center">
         <div className="relative">

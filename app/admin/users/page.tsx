@@ -13,6 +13,7 @@ import {
 import RoleSwitcher from "@/components/admin/RoleSwitcher";
 import { fetchUsers } from "@/lib/actions/admin";
 import { format } from "date-fns";
+import Link from "next/link";
 
 export default async function UsersTable() {
   const usersData = await fetchUsers();
@@ -61,13 +62,18 @@ export default async function UsersTable() {
                 <TableCell>{user.booksBorrowed}</TableCell>
                 <TableCell>{user.university_id}</TableCell>
                 <TableCell>
-                  <Button
-                    variant="ghost"
-                    className="text-blue-600 hover:text-blue-700"
+                  <Link
+                    href={`https://ik.imagekit.io/awwabbookwise${user.university_card}`}
+                    target="_blank"
                   >
-                    View ID Card
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      View ID Card
+                      <ExternalLink className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
                 </TableCell>
                 <TableCell>
                   <Button

@@ -13,6 +13,7 @@ export const fetchUsers = async () => {
       dateJoined: users.created_at,
       role: users.role,
       university_id: users.university_id,
+      university_card: users.university_card,
       booksBorrowed: sql<number>`COUNT(${borrowRecords.id})`,
     })
     .from(users)
@@ -53,4 +54,50 @@ export const fetchBorrowRecordsWithBooks = async () => {
     .leftJoin(books, eq(borrowRecords.bookId, books.id))
     .leftJoin(users, eq(borrowRecords.userId, users.id));
   return borrowRecordsData;
+};
+
+type status = "BORROWED" | "LATE RETURN" | "RETURNED";
+
+export const updateBorrowStatus = async (
+  borrowRecordId: string,
+  status: status
+) => {
+  if (status === "BORROWED") {
+    await db
+      .update(borrowRecords)
+      .set({ status, returnDate: null })
+      .where(eq(borrowRecords.id, borrowRecordId));
+  }
+  if (status === "RETURNED" || status === "LATE RETURN") {
+    await db
+      .update(borrowRecords)
+      .set({ status, returnDate: new Date().toISOString() })
+      .where(eq(borrowRecords.id, borrowRecordId));
+  }
+
+  revalidatePath("/admin/borrow-records");
+};
+
+export const fetchAccountRequests = async () => {
+  const accountRequests = await db
+    .select({
+      id: users.id,
+      fullname: users.fullname,
+      email: users.email,
+      universityId: users.university_id,
+      universityCard: users.university_card,
+      dateJoined: users.created_at,
+    })
+    .from(users)
+    .where(eq(users.status, "PENDING"));
+  return accountRequests;
+};
+
+type accountRequestStatus = "APPROVED" | "PENDING" | "REJECTED";
+export const updateAccountRequestStatus = async (
+  userId: string,
+  status: accountRequestStatus
+) => {
+  await db.update(users).set({ status }).where(eq(users.id, userId));
+  revalidatePath("/admin/account-requests");
 };

@@ -2,8 +2,10 @@
 
 import { db } from "@/database/drizzle";
 import { books, borrowRecords } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import dayjs from "dayjs";
+import { renderToBuffer } from "@react-pdf/renderer";
+import { ReceiptTemplate } from "@/components/ReceiptTemplate";
 
 export const borrowBook = async (params: BorrowBookParams) => {
   const { userId, bookId } = params;
@@ -83,3 +85,46 @@ export const fetchBorrowedBooks = async (userId: string) => {
     };
   }
 };
+
+export const hasUserBorrowedBook = async (userId: string, bookId: string) => {
+  try {
+    const borrowedBook = await db
+      .select()
+      .from(borrowRecords)
+      .where(
+        and(eq(borrowRecords.userId, userId), eq(borrowRecords.bookId, bookId))
+      )
+      .limit(1);
+
+    if (borrowedBook.length > 0) {
+      return borrowedBook[0].status === "BORROWED";
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+export async function generateReceipt(borrowId: string) {
+  try {
+    // In a real app, you would fetch this data from your database
+    const borrowData = {
+      receiptId: borrowId,
+      bookTitle: "The Great Gatsby",
+      author: "F. Scott Fitzgerald",
+      genre: "Classic Literature",
+      borrowDate: new Date(),
+      dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+      duration: 14,
+    };
+
+    const buffer = await renderToBuffer(ReceiptTemplate(borrowData));
+
+    return buffer;
+  } catch (error) {
+    console.error("Failed to generate receipt:", error);
+    throw new Error("Failed to generate receipt");
+  }
+}
