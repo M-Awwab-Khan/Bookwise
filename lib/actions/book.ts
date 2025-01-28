@@ -97,27 +97,34 @@ export const hasUserBorrowedBook = async (userId: string, bookId: string) => {
       .limit(1);
 
     if (borrowedBook.length > 0) {
-      return borrowedBook[0].status === "BORROWED";
+      return { record: borrowedBook[0], hasBorrowed: true };
     } else {
-      return false;
+      return { record: null, hasBorrowed: false };
     }
   } catch (error) {
     console.log(error);
-    return false;
+    return { record: null, hasBorrowed: false };
   }
 };
 
-export async function generateReceipt(borrowId: string) {
+export async function generateReceipt(borrowRecord: any) {
   try {
     // In a real app, you would fetch this data from your database
+    const bookDetails = (
+      await db
+        .select()
+        .from(books)
+        .where(eq(books.id, borrowRecord.bookId))
+        .limit(1)
+    )[0];
     const borrowData = {
-      receiptId: borrowId,
-      bookTitle: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      genre: "Classic Literature",
-      borrowDate: new Date(),
-      dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-      duration: 14,
+      receiptId: borrowRecord.id,
+      bookTitle: bookDetails.title,
+      author: bookDetails.author,
+      genre: bookDetails.genre,
+      borrowDate: new Date(borrowRecord.borrowDate),
+      dueDate: new Date(borrowRecord.dueDate),
+      duration: 7,
     };
 
     const buffer = await renderToBuffer(ReceiptTemplate(borrowData));

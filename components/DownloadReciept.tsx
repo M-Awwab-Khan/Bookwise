@@ -4,14 +4,14 @@ import { Button } from "./ui/button";
 import { Printer } from "lucide-react";
 import { generateReceipt } from "@/lib/actions/book";
 
-const DownloadReciept = ({ borrowId }) => {
+const DownloadReciept = ({ borrowRecord }: any) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleDownload = async () => {
     try {
       setIsLoading(true);
 
-      const buffer = await generateReceipt(borrowId);
+      const buffer = await generateReceipt(borrowRecord);
 
       // Create a blob from the PDF buffer
       const blob = new Blob([buffer], { type: "application/pdf" });
@@ -22,7 +22,7 @@ const DownloadReciept = ({ borrowId }) => {
       // Create a temporary link element
       const link = document.createElement("a");
       link.href = url;
-      link.download = `receipt-${borrowId}.pdf`;
+      link.download = `receipt-${borrowRecord.id}.pdf`;
 
       // Trigger the download
       document.body.appendChild(link);

@@ -72,7 +72,9 @@ const BookOverview = async ({
             borrowingEligibility={borrowingEligibility}
           />
         )}
-        {hasBorrowed && <DownloadReciept borrowId={"123"} />}
+        {hasBorrowed.hasBorrowed && (
+          <DownloadReciept borrowRecord={hasBorrowed.record} />
+        )}
       </div>
       <div className="relative flex flex-1 justify-center">
         <div className="relative">
