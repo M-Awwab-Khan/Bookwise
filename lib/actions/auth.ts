@@ -10,6 +10,7 @@ import ratelimit from "../ratelimit";
 import { redirect } from "next/navigation";
 import { workflowClient } from "../workflows";
 import { config } from "../config";
+import { signOut } from "@/auth";
 
 export const signInWithCredentials = async (
   params: Pick<AuthCredentials, "email" | "password">
@@ -76,4 +77,9 @@ export const signUp = async (params: AuthCredentials) => {
     console.log(error, "Sign up error");
     return { success: false, error: "Sign up error" };
   }
+};
+
+export const logout = async () => {
+  await signOut();
+  return redirect("/");
 };

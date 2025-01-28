@@ -4,8 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn, getInitials } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Session } from "next-auth";
+import { UserNav } from "./UserNav";
 
 const Header = ({ session }: { session: Session }) => {
   const pathname = usePathname();
@@ -27,13 +27,7 @@ const Header = ({ session }: { session: Session }) => {
           </Link>
         </li>
         <li>
-          <Link href="/my-profile">
-            <Avatar>
-              <AvatarFallback className="bg-amber-100">
-                {getInitials(session?.user?.name || "IN")}
-              </AvatarFallback>
-            </Avatar>
-          </Link>
+          <UserNav session={session} />
         </li>
       </ul>
     </header>

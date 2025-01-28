@@ -1,6 +1,5 @@
 import React from "react";
 import Image from "next/image";
-import { Button } from "./ui/button";
 import BookCover from "./BookCover";
 import BorrowBook from "./BorrowBook";
 import { db } from "@/database/drizzle";
@@ -39,7 +38,6 @@ const BookOverview = async ({
         : "You are not eligible to borrow this book",
   };
   const hasBorrowed = await hasUserBorrowedBook(userId, id);
-  console.log(hasBorrowed);
   return (
     <section className="book-overview">
       <div className="flex flex-1 flex-col gap-5">

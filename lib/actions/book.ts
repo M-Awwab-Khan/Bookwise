@@ -2,7 +2,7 @@
 
 import { db } from "@/database/drizzle";
 import { books, borrowRecords } from "@/database/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, ilike, or } from "drizzle-orm";
 import dayjs from "dayjs";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { ReceiptTemplate } from "@/components/ReceiptTemplate";
@@ -70,7 +70,12 @@ export const fetchBorrowedBooks = async (userId: string) => {
       })
       .from(borrowRecords)
       .innerJoin(books, eq(borrowRecords.bookId, books.id))
-      .where(eq(borrowRecords.userId, userId));
+      .where(
+        and(
+          eq(borrowRecords.userId, userId),
+          eq(borrowRecords.status, "BORROWED")
+        )
+      );
 
     return {
       success: true,
@@ -135,3 +140,30 @@ export async function generateReceipt(borrowRecord: any) {
     throw new Error("Failed to generate receipt");
   }
 }
+
+export const searchBooks = async (query: string) => {
+  try {
+    const booksData = await db
+      .select()
+      .from(books)
+      .where(
+        or(
+          ilike(books.title, `%${query}%`),
+          ilike(books.author, `%${query}%`),
+          ilike(books.genre, `%${query}%`)
+        )
+      );
+
+    return {
+      success: true,
+      data: JSON.parse(JSON.stringify(booksData)),
+    };
+  } catch (error) {
+    console.log(error);
+
+    return {
+      success: false,
+      error: "An error occurred while searching for books",
+    };
+  }
+};

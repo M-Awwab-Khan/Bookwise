@@ -13,14 +13,17 @@ import BorrowedBooks from "@/components/BorrowedBooks";
 
 export default async function ProfilePage() {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     redirect("/sign-in");
   }
   const user = (
-    await db.select().from(users).where(eq(users.id, session.user.id)).limit(1)
+    await db
+      .select()
+      .from(users)
+      .where(eq(users.id, session?.user?.id))
+      .limit(1)
   )[0];
   const borrowedBooks = (await fetchBorrowedBooks(user.id)).data;
-  console.log(borrowedBooks);
   return (
     <div className="min-h-screen p-8">
       <div className="grid gap-8 grid-cols-[40%_60%]">
