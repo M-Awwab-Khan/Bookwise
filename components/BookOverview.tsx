@@ -39,6 +39,7 @@ const BookOverview = async ({
         : "You are not eligible to borrow this book",
   };
   const hasBorrowed = await hasUserBorrowedBook(userId, id);
+  console.log(hasBorrowed);
   return (
     <section className="book-overview">
       <div className="flex flex-1 flex-col gap-5">
@@ -65,7 +66,7 @@ const BookOverview = async ({
           </p>
         </div>
         <p className="book-description">{description}</p>
-        {user && !hasBorrowed && (
+        {user && !hasBorrowed.hasBorrowed && (
           <BorrowBook
             userId={userId}
             bookId={id}
