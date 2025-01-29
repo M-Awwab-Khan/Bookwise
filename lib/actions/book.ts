@@ -2,7 +2,7 @@
 
 import { db } from "@/database/drizzle";
 import { books, borrowRecords } from "@/database/schema";
-import { and, eq, ilike, or } from "drizzle-orm";
+import { and, eq, ilike, or, sql } from "drizzle-orm";
 import dayjs from "dayjs";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { ReceiptTemplate } from "@/components/ReceiptTemplate";
@@ -141,7 +141,8 @@ export async function generateReceipt(borrowRecord: any) {
   }
 }
 
-export const searchBooks = async (query: string) => {
+const ITEMS_PER_PAGE = 12;
+export const searchBooks = async (query: string, currentPage: number) => {
   try {
     const booksData = await db
       .select()
@@ -152,7 +153,9 @@ export const searchBooks = async (query: string) => {
           ilike(books.author, `%${query}%`),
           ilike(books.genre, `%${query}%`)
         )
-      );
+      )
+      .limit(ITEMS_PER_PAGE)
+      .offset((currentPage - 1) * ITEMS_PER_PAGE);
 
     return {
       success: true,
@@ -165,5 +168,25 @@ export const searchBooks = async (query: string) => {
       success: false,
       error: "An error occurred while searching for books",
     };
+  }
+};
+
+export const fetchBooksPages = async (query: string) => {
+  try {
+    const count = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(books)
+      .where(
+        or(
+          ilike(books.title, `%${query}%`),
+          ilike(books.author, `%${query}%`),
+          ilike(books.genre, `%${query}%`)
+        )
+      );
+
+    return Math.ceil(Number(count[0].count) / ITEMS_PER_PAGE);
+  } catch (error) {
+    console.log(error);
+    return 0;
   }
 };

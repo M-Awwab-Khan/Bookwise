@@ -6,18 +6,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EmptyState } from "@/components/EmptyState";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import BookCard from "@/components/BookCard";
-import { searchBooks } from "@/lib/actions/book";
+import { fetchBooksPages, searchBooks } from "@/lib/actions/book";
 import SearchBook from "@/components/Search";
+import CustomPagination from "@/components/CustomPagination";
 
 export default async function SearchPage(props: {
   searchParams?: Promise<{
@@ -28,7 +20,8 @@ export default async function SearchPage(props: {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
-  const booksData = (await searchBooks(query)).data;
+  const booksData = (await searchBooks(query, currentPage)).data;
+  const totalPages = await fetchBooksPages(query);
 
   return (
     <>
@@ -59,31 +52,11 @@ export default async function SearchPage(props: {
           <>
             <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
               {booksData.map((book) => (
-                <BookCard key={book.id} {...book} />
+                <BookCard key={book.id} {...book} size="medium" />
               ))}
             </div>
 
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious href="#" />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#" isActive>
-                    1
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#">10</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext href="#" />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <CustomPagination totalPages={totalPages} />
           </>
         )}
       </div>
