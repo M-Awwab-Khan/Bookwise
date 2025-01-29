@@ -30,7 +30,7 @@ export default async function SearchPage(props: {
         {query && (
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-white">
-              Search Result for {query}
+              Search Result for <span className="text-primary">{query}</span>
             </h2>
             <Select>
               <SelectTrigger className="w-[180px] bg-[#22263a] text-white">

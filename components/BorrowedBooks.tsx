@@ -13,7 +13,7 @@ const BorrowedBooks = ({ borrowedBooks }) => {
   };
 
   return (
-    <div className="grid gap-y-6 sm:grid-cols-2 lg:grid-cols-2">
+    <div className="flex flex-row flex-wrap gap-4">
       {borrowedBooks.map((book) => (
         <div key={book.id} className="border-0">
           <div className="p-4 text-white borrowed-book">
