@@ -7,6 +7,12 @@ import dayjs from "dayjs";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { ReceiptTemplate } from "@/components/ReceiptTemplate";
 import { revalidatePath } from "next/cache";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY! // needs insert permissions
+);
 
 export const borrowBook = async (params: BorrowBookParams) => {
   const { userId, bookId } = params;
@@ -241,4 +247,18 @@ export const updateRating = async (
     success: true,
     message: "Rating updated successfully",
   };
+};
+
+export const getSimilarBooks = async (bookId: string, limitCount: number) => {
+  const { data, error } = await supabase.rpc("get_similar_books", {
+    p_book_id: bookId,
+    limit_count: Number(limitCount),
+  });
+
+  if (error) {
+    console.error("Error fetching similar books:", error);
+    return [];
+  }
+  console.log("Similar books data:", data);
+  return data;
 };
