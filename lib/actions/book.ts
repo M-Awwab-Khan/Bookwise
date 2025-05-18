@@ -259,6 +259,5 @@ export const getSimilarBooks = async (bookId: string, limitCount: number) => {
     console.error("Error fetching similar books:", error);
     return [];
   }
-  console.log("Similar books data:", data);
   return data;
 };

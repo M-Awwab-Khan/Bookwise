@@ -43,6 +43,31 @@ interface User {
   email: string;
   universityId: number;
   universityCard: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
-  role: 'USER' | 'ADMIN' | null;
+  status: "PENDING" | "APPROVED" | "REJECTED" | null;
+  role: "USER" | "ADMIN" | null;
+}
+
+// NextAuth.js type extensions
+import "next-auth";
+
+declare module "next-auth" {
+  interface User {
+    role?: string;
+  }
+
+  interface Session {
+    user?: {
+      id?: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      role?: string;
+    };
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    role?: string;
+  }
 }

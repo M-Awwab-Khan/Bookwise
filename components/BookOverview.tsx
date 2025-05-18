@@ -44,7 +44,6 @@ const BookOverview = async ({
     .select()
     .from(interactions)
     .where(and(eq(interactions.bookId, id), eq(interactions.type, "RATE")));
-  console.log(ratings);
 
   // Calculate average rating if there are any ratings
   const averageRating =
