@@ -1,160 +1,24 @@
 {
-  "id": "00000000-0000-0000-0000-000000000000",
-  "prevId": "",
+  "id": "0309fd5a-199b-4e92-b0b0-be6d8d4ff0d3",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.users": {
-      "name": "users",
+    "public.book_embeddings": {
+      "name": "book_embeddings",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "fullname": {
-          "name": "fullname",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "university_id": {
-          "name": "university_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "university_card": {
-          "name": "university_card",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'PENDING'"
-        },
-        "role": {
-          "name": "role",
-          "type": "role",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'USER'"
-        },
-        "last_activity_date": {
-          "name": "last_activity_date",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_email_unique": {
-          "columns": [
-            "email"
-          ],
-          "nullsNotDistinct": false,
-          "name": "users_email_unique"
-        },
-        "users_university_id_unique": {
-          "columns": [
-            "university_id"
-          ],
-          "nullsNotDistinct": false,
-          "name": "users_university_id_unique"
-        },
-        "users_university_card_unique": {
-          "columns": [
-            "university_card"
-          ],
-          "nullsNotDistinct": false,
-          "name": "users_university_card_unique"
-        }
-      },
-      "checkConstraints": {},
-      "policies": {},
-      "isRLSEnabled": false
-    },
-    "public.borrow_records": {
-      "name": "borrow_records",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
         "book_id": {
           "name": "book_id",
           "type": "uuid",
-          "primaryKey": false,
+          "primaryKey": true,
           "notNull": true
         },
-        "borrow_date": {
-          "name": "borrow_date",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "due_date": {
-          "name": "due_date",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "return_date": {
-          "name": "return_date",
-          "type": "date",
+        "embedding": {
+          "name": "embedding",
+          "type": "vector(768)",
           "primaryKey": false,
           "notNull": false
-        },
-        "status": {
-          "name": "status",
-          "type": "borrow_status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'BORROWED'"
         },
         "created_at": {
           "name": "created_at",
@@ -164,41 +28,43 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "book_embedding_hnsw_idx": {
+          "name": "book_embedding_hnsw_idx",
+          "columns": [
+            {
+              "expression": "embedding",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "vector_cosine_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "hnsw",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "borrow_records_book_id_books_id_fk": {
-          "name": "borrow_records_book_id_books_id_fk",
-          "tableFrom": "borrow_records",
+        "book_embeddings_book_id_fkey": {
+          "name": "book_embeddings_book_id_fkey",
+          "tableFrom": "book_embeddings",
           "tableTo": "books",
-          "schemaTo": "public",
           "columnsFrom": [
             "book_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "borrow_records_user_id_users_id_fk": {
-          "name": "borrow_records_user_id_users_id_fk",
-          "tableFrom": "borrow_records",
-          "tableTo": "users",
-          "schemaTo": "public",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.books": {
@@ -292,25 +158,59 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.book_embeddings": {
-      "name": "book_embeddings",
+    "public.borrow_records": {
+      "name": "borrow_records",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
         "book_id": {
           "name": "book_id",
           "type": "uuid",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": true
         },
-        "embedding": {
-          "name": "embedding",
-          "type": "vector(768)",
+        "borrow_date": {
+          "name": "borrow_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "due_date": {
+          "name": "due_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "return_date": {
+          "name": "return_date",
+          "type": "date",
           "primaryKey": false,
           "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "borrow_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'BORROWED'"
         },
         "created_at": {
           "name": "created_at",
@@ -320,44 +220,39 @@
           "default": "now()"
         }
       },
-      "indexes": {
-        "book_embedding_hnsw_idx": {
-          "name": "book_embedding_hnsw_idx",
-          "columns": [
-            {
-              "expression": "embedding",
-              "asc": true,
-              "nulls": "last",
-              "opclass": "vector_cosine_ops",
-              "isExpression": false
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "hnsw",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
-        "book_embeddings_book_id_fkey": {
-          "name": "book_embeddings_book_id_fkey",
-          "tableFrom": "book_embeddings",
+        "borrow_records_book_id_books_id_fk": {
+          "name": "borrow_records_book_id_books_id_fk",
+          "tableFrom": "borrow_records",
           "tableTo": "books",
-          "schemaTo": "public",
           "columnsFrom": [
             "book_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "borrow_records_user_id_users_id_fk": {
+          "name": "borrow_records_user_id_users_id_fk",
+          "tableFrom": "borrow_records",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.interactions": {
@@ -410,7 +305,6 @@
           "name": "interactions_book_id_fkey",
           "tableFrom": "interactions",
           "tableTo": "books",
-          "schemaTo": "public",
           "columnsFrom": [
             "book_id"
           ],
@@ -424,7 +318,6 @@
           "name": "interactions_user_id_fkey",
           "tableFrom": "interactions",
           "tableTo": "users",
-          "schemaTo": "public",
           "columnsFrom": [
             "user_id"
           ],
@@ -437,8 +330,8 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.user_cf_recs": {
@@ -464,7 +357,6 @@
           "name": "user_cf_recs_user_id_fkey",
           "tableFrom": "user_cf_recs",
           "tableTo": "users",
-          "schemaTo": "public",
           "columnsFrom": [
             "user_id"
           ],
@@ -477,47 +369,149 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "fullname": {
+          "name": "fullname",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "university_id": {
+          "name": "university_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "university_card": {
+          "name": "university_card",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'PENDING'"
+        },
+        "role": {
+          "name": "role",
+          "type": "role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'USER'"
+        },
+        "last_activity_date": {
+          "name": "last_activity_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        },
+        "users_university_id_unique": {
+          "name": "users_university_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "university_id"
+          ]
+        },
+        "users_university_card_unique": {
+          "name": "users_university_card_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "university_card"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     }
   },
   "enums": {
     "public.borrow_status": {
       "name": "borrow_status",
+      "schema": "public",
       "values": [
         "BORROWED",
         "RETURNED",
         "LATE RETURN"
-      ],
-      "schema": "public"
+      ]
     },
     "public.interaction_type": {
       "name": "interaction_type",
+      "schema": "public",
       "values": [
-        "view",
-        "borrow",
-        "favorite",
-        "rate"
-      ],
-      "schema": "public"
+        "VIEW",
+        "BORROW",
+        "FAVORITE",
+        "RATE"
+      ]
     },
     "public.role": {
       "name": "role",
+      "schema": "public",
       "values": [
         "USER",
         "ADMIN"
-      ],
-      "schema": "public"
+      ]
     },
     "public.status": {
       "name": "status",
+      "schema": "public",
       "values": [
         "PENDING",
         "APPROVED",
         "REJECTED"
-      ],
-      "schema": "public"
+      ]
     }
   },
   "schemas": {},
@@ -526,21 +520,8 @@
   "policies": {},
   "views": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "internal": {
-    "tables": {
-      "user_cf_recs": {
-        "columns": {
-          "recs": {
-            "isArray": true,
-            "dimensions": 1,
-            "rawType": "uuid"
-          }
-        }
-      }
-    }
+    "tables": {}
   }
 }

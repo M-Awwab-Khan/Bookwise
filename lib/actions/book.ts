@@ -1,11 +1,12 @@
 "use server";
 
 import { db } from "@/database/drizzle";
-import { books, borrowRecords } from "@/database/schema";
+import { books, borrowRecords, interactions } from "@/database/schema";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
 import dayjs from "dayjs";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { ReceiptTemplate } from "@/components/ReceiptTemplate";
+import { revalidatePath } from "next/cache";
 
 export const borrowBook = async (params: BorrowBookParams) => {
   const { userId, bookId } = params;
@@ -189,4 +190,55 @@ export const fetchBooksPages = async (query: string) => {
     console.log(error);
     return 0;
   }
+};
+
+export const updateRating = async (
+  value: number,
+  userId: string,
+  bookId: string
+) => {
+  try {
+    // Update the rating in the database
+    // First check if the user has already rated this book
+    const existingRating = await db
+      .select()
+      .from(interactions)
+      .where(
+        and(
+          eq(interactions.userId, userId),
+          eq(interactions.bookId, bookId),
+          eq(interactions.type, "RATE")
+        )
+      )
+      .limit(1);
+
+    if (existingRating.length > 0) {
+      // If rating exists, update it
+      await db
+        .update(interactions)
+        .set({ rating: value })
+        .where(
+          and(
+            eq(interactions.userId, userId),
+            eq(interactions.bookId, bookId),
+            eq(interactions.type, "RATE")
+          )
+        );
+    } else {
+      // If no rating exists, insert a new one
+      await db.insert(interactions).values({
+        userId,
+        bookId,
+        type: "RATE",
+        rating: value,
+      });
+    }
+    revalidatePath(`/books/${bookId}`);
+  } catch (error) {
+    console.log("Error updating rating:", error);
+  }
+  return {
+    success: true,
+    message: "Rating updated successfully",
+  };
 };

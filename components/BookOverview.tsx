@@ -3,10 +3,11 @@ import Image from "next/image";
 import BookCover from "./BookCover";
 import BorrowBook from "./BorrowBook";
 import { db } from "@/database/drizzle";
-import { users } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { interactions, users } from "@/database/schema";
+import { and, eq } from "drizzle-orm";
 import { hasUserBorrowedBook } from "@/lib/actions/book";
 import DownloadReciept from "./DownloadReciept";
+import RatingWrapper from "./RatingWrapper";
 
 interface Props extends Book {
   userId: string;
@@ -38,11 +39,29 @@ const BookOverview = async ({
         : "You are not eligible to borrow this book",
   };
   const hasBorrowed = await hasUserBorrowedBook(userId, id);
+
+  const ratings = await db
+    .select()
+    .from(interactions)
+    .where(and(eq(interactions.bookId, id), eq(interactions.type, "RATE")));
+  console.log(ratings);
+
+  // Calculate average rating if there are any ratings
+  const averageRating =
+    ratings.length > 0
+      ? ratings.reduce(
+          (sum, interaction) => sum + (interaction.rating || 0),
+          0
+        ) / ratings.length
+      : 0;
+
   return (
     <section className="book-overview">
       <div className="flex flex-1 flex-col gap-5">
         <h1>{title}</h1>
         <div className="book-info">
+          {/* rating */}
+          <RatingWrapper bookId={id} currentRating={averageRating} />
           <p>
             By <span className="font-semibold text-light-200">{author}</span>
           </p>
@@ -50,10 +69,6 @@ const BookOverview = async ({
             Category{" "}
             <span className="font-semibold text-light-200">{genre}</span>
           </p>
-          <div className="flex flex-row gap-1">
-            <Image src="/icons/star.svg" alt="star" width={22} height={22} />
-            <p>{rating}</p>
-          </div>
         </div>
         <div className="book-copies">
           <p>
