@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { db } from "@/database/drizzle";
 import { books } from "@/database/schema";
 import { desc } from "drizzle-orm";
+import { Book } from "@/types";
 
 export default async function Home() {
   const session = await auth();
