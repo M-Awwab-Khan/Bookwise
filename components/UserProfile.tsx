@@ -2,7 +2,6 @@
 import React from 'react';
 import Profile from './Profile';
 import Image from 'next/image';
-import { User } from '../types';
 
 const UserProfile = ({
   fullName,
