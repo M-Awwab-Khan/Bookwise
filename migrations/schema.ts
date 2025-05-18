@@ -105,4 +105,3 @@ export const userCfRecs = pgTable("user_cf_recs", {
 			name: "user_cf_recs_user_id_fkey"
 		}).onDelete("cascade"),
 ]);
-

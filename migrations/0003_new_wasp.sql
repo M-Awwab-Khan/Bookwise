@@ -1,1 +1,0 @@
-ALTER TYPE "public"."borrow_status" ADD VALUE 'LATE RETURNED';

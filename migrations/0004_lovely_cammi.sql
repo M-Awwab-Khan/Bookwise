@@ -1,1 +1,0 @@
-ALTER TYPE "public"."borrow_status" RENAME VALUE 'LATE RETURNED' TO 'LATE RETURN';

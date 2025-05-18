@@ -10,10 +10,10 @@ export const fetchUsers = async () => {
       id: users.id,
       fullname: users.fullname,
       email: users.email,
-      dateJoined: users.created_at,
+      dateJoined: users.createdAt,
       role: users.role,
-      university_id: users.university_id,
-      university_card: users.university_card,
+      university_id: users.universityId,
+      university_card: users.universityCard,
       booksBorrowed: sql<number>`COUNT(${borrowRecords.id})`,
     })
     .from(users)
@@ -84,9 +84,9 @@ export const fetchAccountRequests = async () => {
       id: users.id,
       fullname: users.fullname,
       email: users.email,
-      universityId: users.university_id,
-      universityCard: users.university_card,
-      dateJoined: users.created_at,
+      universityId: users.universityId,
+      universityCard: users.universityCard,
+      dateJoined: users.createdAt,
     })
     .from(users)
     .where(eq(users.status, "PENDING"));

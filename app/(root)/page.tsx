@@ -15,7 +15,7 @@ export default async function Home() {
     .orderBy(desc(books.createdAt))) as Book[];
   return (
     <div>
-      <BookOverview {...latestBooks[0]} />
+      <BookOverview {...latestBooks[0]} userId={session?.user?.id || ""} />
       <BookList
         title="Latest Books"
         books={latestBooks.slice(1)}

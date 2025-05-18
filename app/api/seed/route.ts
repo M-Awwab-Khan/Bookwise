@@ -1,11 +1,9 @@
-import dummyBooks from "../dummyBooks.json";
+import dummyBooks from "../../../dummyBooks.json";
 import ImageKit from "imagekit";
 import { books } from "@/database/schema";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { config } from "dotenv";
-
-config({ path: ".env.local" });
+import { NextResponse } from "next/server";
 
 const client = postgres(process.env.DATABASE_URL!, {
   prepare: false,
@@ -37,7 +35,7 @@ const uploadToImageKit = async (
   }
 };
 
-const seed = async () => {
+export async function GET() {
   console.log("Seeding data...");
 
   try {
@@ -62,9 +60,15 @@ const seed = async () => {
     }
 
     console.log("Data seeded successfully!");
+    return NextResponse.json({ success: true, message: "Data seeded successfully!" });
   } catch (error) {
     console.error("Error seeding data:", error);
+    return NextResponse.json(
+      { success: false, message: "Error seeding data", error },
+      { status: 500 }
+    );
+  } finally {
+    // Close the client connection when done
+    await client.end();
   }
-};
-
-seed();
+}

@@ -23,12 +23,12 @@ const Layout = async ({ children }: { children: ReactNode }) => {
       .where(eq(users.id, session?.user?.id))
       .limit(1);
 
-    if (user[0].last_activity_date === new Date().toISOString().slice(0, 10))
+    if (user[0].lastActivityDate === new Date().toISOString().slice(0, 10))
       return;
 
     await db
       .update(users)
-      .set({ last_activity_date: new Date().toISOString().slice(0, 10) })
+      .set({ lastActivityDate: new Date().toISOString().slice(0, 10) })
       .where(eq(users.id, session?.user?.id));
   });
 

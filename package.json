@@ -10,7 +10,9 @@
     "seed": "npx tsx database/seed.ts",
     "db:generate": "npx drizzle-kit generate",
     "db:migrate": "npx drizzle-kit migrate",
-    "db:studio": "npx drizzle-kit studio"
+    "db:studio": "npx drizzle-kit studio",
+    "db:push": "npx drizzle-kit push",
+    "db:pull": "npx drizzle-kit pull"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -39,6 +41,7 @@
     "lucide-react": "^0.471.1",
     "next": "15.1.4",
     "next-auth": "^5.0.0-beta.25",
+    "postgres": "^3.4.5",
     "react": "^19.0.0",
     "react-colorful": "^5.6.1",
     "react-dom": "^19.0.0",

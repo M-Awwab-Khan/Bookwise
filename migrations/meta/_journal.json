@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1737036581802,
-      "tag": "0000_fantastic_retro_girl",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1737309520435,
-      "tag": "0001_careful_zombie",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1737424212188,
-      "tag": "0002_organic_kabuki",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1737995865847,
-      "tag": "0003_new_wasp",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1737996228198,
-      "tag": "0004_lovely_cammi",
+      "when": 1747575446784,
+      "tag": "0000_yellow_miracleman",
       "breakpoints": true
     }
   ]
