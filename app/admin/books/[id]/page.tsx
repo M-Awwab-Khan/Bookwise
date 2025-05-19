@@ -4,7 +4,7 @@ import BookVideo from "@/components/BookVideo";
 import { Button } from "@/components/ui/button";
 import { db } from "@/database/drizzle";
 import { books } from "@/database/schema";
-import { darkenColor } from "@/lib/utils";
+import { darkenColor, hexToHSL, increaseLightness } from "@/lib/utils";
 import { eq } from "drizzle-orm";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
@@ -43,7 +43,10 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
             <div
               className="px-6 py-12 flex justify-center items-center rounded-md w-60 h-56"
               style={{
-                backgroundColor: darkenColor(book.coverColor, 30), // Darken the coverColor
+                backgroundColor: increaseLightness(
+                  hexToHSL(book.coverColor),
+                  70
+                ), // Darken the coverColor
               }}
             >
               <BookCover
@@ -63,7 +66,14 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
                     width={20}
                     height={20}
                   />
-                  <span className="text-dark-200">{book.createdAt}</span>
+                  <span className="text-dark-200">
+                    {book.createdAt &&
+                      new Date(book.createdAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                  </span>
                 </span>
               </p>
               <h2 className="font-semibold text-2xl text-dark-400">
