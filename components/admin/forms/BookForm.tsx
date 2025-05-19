@@ -19,39 +19,50 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import FileUpload from "@/components/FileUpload";
 import ColorPicker from "@/components/admin/ColorPicker";
-import { createBook } from "@/lib/admin/actions/book";
+import { createBook, updateBook } from "@/lib/admin/actions/book";
 import { toast } from "@/hooks/use-toast";
+import { Book } from "@/types";
+import { Loader2 } from "lucide-react";
 
-interface Props extends Partial<Book> {
+interface BookFormProps {
   type?: "create" | "update";
+  book?: Book;
 }
 
-const BookForm = ({ type, ...book }: Props) => {
+const BookForm = ({ type = "create", book }: BookFormProps) => {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof bookSchema>>({
     resolver: zodResolver(bookSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      author: "",
-      genre: "",
-      rating: 1,
-      totalCopies: 1,
-      coverUrl: "",
-      coverColor: "",
-      videoUrl: "",
-      summary: "",
+      title: book?.title || "",
+      description: book?.description || "",
+      author: book?.author || "",
+      genre: book?.genre || "",
+      rating: book?.rating || 1,
+      totalCopies: book?.totalCopies || 1,
+      coverUrl: book?.coverUrl || "",
+      coverColor: book?.coverColor || "#000000",
+      videoUrl: book?.videoUrl || "",
+      summary: book?.summary || "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof bookSchema>) => {
-    const result = await createBook(values);
+    let result;
+    if (type === "update" && book?.id) {
+      result = await updateBook(values, book.id);
+    } else {
+      result = await createBook(values);
+    }
 
     if (result.success) {
       toast({
         title: "Success",
-        description: "Book created successfully",
+        description:
+          type === "update"
+            ? "Book updated successfully!"
+            : "Book added successfully!",
       });
 
       router.push(`/admin/books/${result.data.id}`);
@@ -282,8 +293,21 @@ const BookForm = ({ type, ...book }: Props) => {
           )}
         />
 
-        <Button type="submit" className="book-form_btn text-white">
-          Add Book to Library
+        <Button
+          type="submit"
+          className="book-form_btn text-white"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {type === "update" ? "Updating..." : "Adding..."}
+            </>
+          ) : type === "update" ? (
+            "Update Book"
+          ) : (
+            "Add Book to Library"
+          )}
         </Button>
       </form>
     </Form>

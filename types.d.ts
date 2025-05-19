@@ -11,7 +11,7 @@ interface Book {
   coverUrl: string;
   videoUrl: string;
   summary: string;
-  createdAt: Date | null;
+  createdAt: string | null;
 }
 
 interface AuthCredentials {
