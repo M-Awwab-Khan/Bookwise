@@ -1,13 +1,17 @@
 import React from "react";
-import Image from "next/image";
 import BookCover from "./BookCover";
 import BorrowBook from "./BorrowBook";
 import { db } from "@/database/drizzle";
-import { interactions, users } from "@/database/schema";
-import { and, eq } from "drizzle-orm";
+import { users } from "@/database/schema";
+import { eq } from "drizzle-orm";
 import { hasUserBorrowedBook } from "@/lib/actions/book";
 import DownloadReciept from "./DownloadReciept";
 import RatingWrapper from "./RatingWrapper";
+import { Book } from "@/types";
+import {
+  getUserRatingonBook,
+  getAverageRatingofBook,
+} from "@/lib/actions/book";
 
 interface Props extends Book {
   userId: string;
@@ -40,19 +44,10 @@ const BookOverview = async ({
   };
   const hasBorrowed = await hasUserBorrowedBook(userId, id);
 
-  const ratings = await db
-    .select()
-    .from(interactions)
-    .where(and(eq(interactions.bookId, id), eq(interactions.type, "RATE")));
-
-  // Calculate average rating if there are any ratings
-  const averageRating =
-    ratings.length > 0
-      ? ratings.reduce(
-          (sum, interaction) => sum + (interaction.rating || 0),
-          0
-        ) / ratings.length
-      : 0;
+  const [userRating, averageRating] = await Promise.all([
+    getUserRatingonBook(userId, id),
+    getAverageRatingofBook(id),
+  ]);
 
   return (
     <section className="book-overview">
@@ -60,7 +55,11 @@ const BookOverview = async ({
         <h1>{title}</h1>
         <div className="book-info">
           {/* rating */}
-          <RatingWrapper bookId={id} currentRating={averageRating} />
+          <RatingWrapper
+            bookId={id}
+            averageRating={averageRating || 0}
+            userRating={userRating || 0}
+          />
           <p>
             By <span className="font-semibold text-light-200">{author}</span>
           </p>

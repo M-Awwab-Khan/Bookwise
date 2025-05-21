@@ -273,7 +273,7 @@ export const getMostBorrowedBooks = async (limitCount: number) => {
         coverUrl: books.coverUrl,
         coverColor: books.coverColor,
         genre: books.genre,
-        borrowCount: sql<number>`count(${borrowRecords.id})`.as('borrow_count')
+        borrowCount: sql<number>`count(${borrowRecords.id})`.as("borrow_count"),
       })
       .from(books)
       .leftJoin(borrowRecords, eq(books.id, borrowRecords.bookId))
@@ -286,7 +286,7 @@ export const getMostBorrowedBooks = async (limitCount: number) => {
     console.error("Error fetching popular books:", error);
     return [];
   }
-}
+};
 
 export const getHighlyRatedBooks = async (limitCount: number) => {
   try {
@@ -298,7 +298,7 @@ export const getHighlyRatedBooks = async (limitCount: number) => {
         coverUrl: books.coverUrl,
         coverColor: books.coverColor,
         genre: books.genre,
-        avgRating: sql<number>`avg(${interactions.rating})`.as('avg_rating')
+        avgRating: sql<number>`avg(${interactions.rating})`.as("avg_rating"),
       })
       .from(books)
       .leftJoin(interactions, eq(books.id, interactions.bookId))
@@ -312,7 +312,7 @@ export const getHighlyRatedBooks = async (limitCount: number) => {
     console.error("Error fetching highly rated books:", error);
     return [];
   }
-}
+};
 
 export const getLatestBooks = async (limitCount: number) => {
   try {
@@ -327,4 +327,42 @@ export const getLatestBooks = async (limitCount: number) => {
     console.error("Error fetching latest books:", error);
     return [];
   }
-}
+};
+
+export const getUserRatingonBook = async (userId: string, bookId: string) => {
+  try {
+    const rating = await db
+      .select({ rating: interactions.rating })
+      .from(interactions)
+      .where(
+        and(
+          eq(interactions.userId, userId),
+          eq(interactions.bookId, bookId),
+          eq(interactions.type, "RATE")
+        )
+      )
+      .limit(1);
+
+    return rating.length > 0 ? rating[0].rating : null;
+  } catch (error) {
+    console.error("Error fetching user rating:", error);
+    return null;
+  }
+};
+
+export const getAverageRatingofBook = async (bookId: string) => {
+  try {
+    const ratings = await db
+      .select({ avgRating: sql<number>`avg(${interactions.rating})` })
+      .from(interactions)
+      .where(
+        and(eq(interactions.bookId, bookId), eq(interactions.type, "RATE"))
+      )
+      .limit(1);
+
+    return ratings.length > 0 ? ratings[0].avgRating : null;
+  } catch (error) {
+    console.error("Error fetching average rating:", error);
+    return null;
+  }
+};
