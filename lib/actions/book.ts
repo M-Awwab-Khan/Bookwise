@@ -2,12 +2,13 @@
 
 import { db } from "@/database/drizzle";
 import { books, borrowRecords, interactions } from "@/database/schema";
-import { and, eq, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import dayjs from "dayjs";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { ReceiptTemplate } from "@/components/ReceiptTemplate";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
+import { BorrowBookParams } from "@/types";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -261,3 +262,69 @@ export const getSimilarBooks = async (bookId: string, limitCount: number) => {
   }
   return data;
 };
+
+export const getMostBorrowedBooks = async (limitCount: number) => {
+  try {
+    const popularBooks = await db
+      .select({
+        id: books.id,
+        title: books.title,
+        author: books.author,
+        coverUrl: books.coverUrl,
+        coverColor: books.coverColor,
+        genre: books.genre,
+        borrowCount: sql<number>`count(${borrowRecords.id})`.as('borrow_count')
+      })
+      .from(books)
+      .leftJoin(borrowRecords, eq(books.id, borrowRecords.bookId))
+      .groupBy(books.id)
+      .orderBy(sql`borrow_count desc`)
+      .limit(limitCount);
+
+    return JSON.parse(JSON.stringify(popularBooks));
+  } catch (error) {
+    console.error("Error fetching popular books:", error);
+    return [];
+  }
+}
+
+export const getHighlyRatedBooks = async (limitCount: number) => {
+  try {
+    const highlyRatedBooks = await db
+      .select({
+        id: books.id,
+        title: books.title,
+        author: books.author,
+        coverUrl: books.coverUrl,
+        coverColor: books.coverColor,
+        genre: books.genre,
+        avgRating: sql<number>`avg(${interactions.rating})`.as('avg_rating')
+      })
+      .from(books)
+      .leftJoin(interactions, eq(books.id, interactions.bookId))
+      .where(eq(interactions.type, "RATE"))
+      .groupBy(books.id)
+      .orderBy(sql`avg_rating desc`)
+      .limit(limitCount);
+
+    return JSON.parse(JSON.stringify(highlyRatedBooks));
+  } catch (error) {
+    console.error("Error fetching highly rated books:", error);
+    return [];
+  }
+}
+
+export const getLatestBooks = async (limitCount: number) => {
+  try {
+    const latestBooks = await db
+      .select()
+      .from(books)
+      .orderBy(desc(books.createdAt))
+      .limit(limitCount);
+
+    return JSON.parse(JSON.stringify(latestBooks));
+  } catch (error) {
+    console.error("Error fetching latest books:", error);
+    return [];
+  }
+}
