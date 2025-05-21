@@ -46,6 +46,13 @@ export const borrowBook = async (params: BorrowBookParams) => {
       .set({ availableCopies: book[0].availableCopies - 1 })
       .where(eq(books.id, bookId));
 
+    // interaction
+    await db.insert(interactions).values({
+      userId,
+      bookId,
+      type: "BORROW",
+    });
+
     return {
       success: true,
       data: JSON.parse(JSON.stringify(record)),

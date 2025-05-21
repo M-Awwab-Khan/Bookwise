@@ -12,6 +12,7 @@ import {
   getUserRatingonBook,
   getAverageRatingofBook,
 } from "@/lib/actions/book";
+import { BookmarkButton } from "./BookmarkButton";
 
 interface Props extends Book {
   userId: string;
@@ -50,7 +51,7 @@ const BookOverview = async ({
   ]);
 
   return (
-    <section className="book-overview">
+    <section className="relative book-overview">
       <div className="flex flex-1 flex-col gap-5">
         <h1>{title}</h1>
         <div className="book-info">
@@ -104,6 +105,9 @@ const BookOverview = async ({
             />
           </div>
         </div>
+      </div>
+      <div className="absolute top-10 right-10 z-100 scale-[2.0]">
+        <BookmarkButton initialState={false} />
       </div>
     </section>
   );

@@ -1,9 +1,6 @@
 "use client";
-import React, { useEffect } from "react";
 import { Rating, RatingButton } from "@/components/ui/rating";
-import { db } from "@/database/drizzle";
 import { useSession } from "next-auth/react";
-import { interactions } from "@/database/schema";
 import { updateRating } from "@/lib/actions/book";
 import { useToast } from "@/hooks/use-toast";
 
