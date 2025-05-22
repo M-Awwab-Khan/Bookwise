@@ -34,7 +34,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
 
   return (
     <main className="root-container">
-      <div className="mx-auto max-w-6xl w-full">
+      <div className="mx-auto max-w-[1400px] w-full">
         <Header session={session} />
         <div className="mt-20 pb-20">{children}</div>
       </div>

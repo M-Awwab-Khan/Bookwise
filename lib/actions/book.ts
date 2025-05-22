@@ -423,3 +423,15 @@ export const updateBookmarkStatus = async (bookId: string, userId: string) => {
     return false;
   }
 };
+
+export const viewBookInteraction = async (userId: string, bookId: string) => {
+  try {
+    await db.insert(interactions).values({
+      userId,
+      bookId,
+      type: "VIEW",
+    });
+  } catch (error) {
+    console.error("Error logging view interaction:", error);
+  }
+};

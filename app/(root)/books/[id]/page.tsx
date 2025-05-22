@@ -4,7 +4,7 @@ import BookOverview from "@/components/BookOverview";
 import BookVideo from "@/components/BookVideo";
 import { db } from "@/database/drizzle";
 import { books } from "@/database/schema";
-import { getSimilarBooks } from "@/lib/actions/book";
+import { getSimilarBooks, viewBookInteraction } from "@/lib/actions/book";
 import { Book } from "@/types";
 import { eq, and, ne } from "drizzle-orm";
 import Link from "next/link";
@@ -26,6 +26,8 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
     .catch(() => [])) as Book[];
 
   if (!bookDetails) redirect("/404");
+
+  viewBookInteraction(session?.user?.id as string, id);
 
   // Fetch similar books by genre
   // const similarBooks = await db

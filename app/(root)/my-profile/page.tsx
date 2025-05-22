@@ -1,18 +1,18 @@
-import { auth } from '@/auth';
-import BorrowedBooksList from '@/components/BorrowedBooksList';
-import UserProfile from '@/components/UserProfile';
-import { db } from '@/database/drizzle';
-import { users } from '@/database/schema';
-import { eq } from 'drizzle-orm';
-import { redirect } from 'next/navigation';
-import React from 'react';
+import { auth } from "@/auth";
+import BorrowedBooksList from "@/components/BorrowedBooksList";
+import UserProfile from "@/components/UserProfile";
+import { db } from "@/database/drizzle";
+import { users } from "@/database/schema";
+import { eq } from "drizzle-orm";
+import { redirect } from "next/navigation";
+import React from "react";
 
 const MyProfile = async () => {
   try {
     const session = await auth();
 
     if (!session?.user?.id) {
-      redirect('/sign-in');
+      redirect("/sign-in");
       return null; // Ensure no further execution
     }
 
@@ -30,22 +30,22 @@ const MyProfile = async () => {
       .limit(1);
 
     if (!userInfo) {
-      redirect('/');
+      redirect("/");
       return null; // Ensure no further execution
     }
 
     return (
-      <div className="flex flex-col md:pt-10 md:flex-row gap-8 md:gap-20">
-        {/* User Profile */}
+      <div className="flex flex-col md:pt-10 min-[870px]:flex-row gap-8 md:gap-12">
+        {/* User Profile - left side */}
         <UserProfile {...userInfo} />
 
-        {/* Borrowed books */}
+        {/* Borrowed books - right side */}
         <BorrowedBooksList />
       </div>
     );
   } catch (error) {
-    console.error('Error loading profile:', error);
-    redirect('/error'); // Redirect to a generic error page
+    console.error("Error loading profile:", error);
+    redirect("/error"); // Redirect to a generic error page
     return null; // Ensure no further execution
   }
 };
