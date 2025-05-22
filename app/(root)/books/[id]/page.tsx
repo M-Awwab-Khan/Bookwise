@@ -5,6 +5,7 @@ import BookVideo from "@/components/BookVideo";
 import { db } from "@/database/drizzle";
 import { books } from "@/database/schema";
 import { getSimilarBooks } from "@/lib/actions/book";
+import { Book } from "@/types";
 import { eq, and, ne } from "drizzle-orm";
 import Link from "next/link";
 import { redirect } from "next/navigation";

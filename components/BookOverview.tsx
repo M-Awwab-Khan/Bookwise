@@ -11,8 +11,9 @@ import { Book } from "@/types";
 import {
   getUserRatingonBook,
   getAverageRatingofBook,
+  getBookmarkStatus,
 } from "@/lib/actions/book";
-import { BookmarkButton } from "./BookmarkButton";
+import BookmarkWrapper from "./BookmarkWrapper";
 
 interface Props extends Book {
   userId: string;
@@ -43,12 +44,14 @@ const BookOverview = async ({
         ? "Book is not available"
         : "You are not eligible to borrow this book",
   };
-  const hasBorrowed = await hasUserBorrowedBook(userId, id);
 
-  const [userRating, averageRating] = await Promise.all([
-    getUserRatingonBook(userId, id),
-    getAverageRatingofBook(id),
-  ]);
+  const [userRating, averageRating, hasBorrowed, bookmarkStatus] =
+    await Promise.all([
+      getUserRatingonBook(userId, id),
+      getAverageRatingofBook(id),
+      hasUserBorrowedBook(userId, id),
+      getBookmarkStatus(id, userId),
+    ]);
 
   return (
     <section className="relative book-overview">
@@ -106,9 +109,11 @@ const BookOverview = async ({
           </div>
         </div>
       </div>
-      <div className="absolute top-10 right-10 z-100 scale-[2.0]">
-        <BookmarkButton initialState={false} />
-      </div>
+      <BookmarkWrapper
+        bookId={id}
+        userId={userId}
+        bookmarkStatus={bookmarkStatus}
+      />
     </section>
   );
 };

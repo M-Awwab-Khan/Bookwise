@@ -373,3 +373,53 @@ export const getAverageRatingofBook = async (bookId: string) => {
     return null;
   }
 };
+
+export const getBookmarkStatus = async (bookId: string, userId: string) => {
+  try {
+    const bookmark = await db
+      .select()
+      .from(interactions)
+      .where(
+        and(
+          eq(interactions.userId, userId),
+          eq(interactions.bookId, bookId),
+          eq(interactions.type, "FAVORITE")
+        )
+      )
+      .limit(1);
+
+    return bookmark.length > 0;
+  } catch (error) {
+    console.error("Error fetching bookmark status:", error);
+    return false;
+  }
+};
+
+export const updateBookmarkStatus = async (bookId: string, userId: string) => {
+  try {
+    const bookmarkExists = await getBookmarkStatus(bookId, userId);
+
+    if (bookmarkExists) {
+      await db
+        .delete(interactions)
+        .where(
+          and(
+            eq(interactions.userId, userId),
+            eq(interactions.bookId, bookId),
+            eq(interactions.type, "FAVORITE")
+          )
+        );
+    } else {
+      await db.insert(interactions).values({
+        userId,
+        bookId,
+        type: "FAVORITE",
+      });
+    }
+
+    return !bookmarkExists;
+  } catch (error) {
+    console.error("Error updating bookmark status:", error);
+    return false;
+  }
+};
