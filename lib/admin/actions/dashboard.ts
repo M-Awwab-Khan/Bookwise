@@ -39,6 +39,7 @@ export const fetchBookRequests = async (): Promise<BookRequests[]> => {
         dueDate: borrowRecords.dueDate,
 
         bookInfo: {
+          id: books.id,
           title: books.title,
           coverUrl: books.coverUrl,
           coverColor: books.coverColor,
