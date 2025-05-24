@@ -14,6 +14,19 @@ interface Book {
   createdAt: string | null;
 }
 
+export enum ROLE {
+  "USER" = "USER",
+  "ADMIN" = "ADMIN",
+}
+
+export interface TableBook extends Book {
+  info: {
+    title: string;
+    coverColor: string;
+    coverUrl: string;
+  };
+}
+
 interface AuthCredentials {
   fullname: string;
   email: string;
@@ -75,6 +88,7 @@ declare module "next-auth/jwt" {
 export interface BookRequests {
   id: string;
   bookInfo: {
+    id: string;
     coverUrl: string;
     coverColor: string;
     title: string;
@@ -86,7 +100,33 @@ export interface BookRequests {
     email: string;
   };
   status: "BORROWED" | "RETURNED" | "LATE RETURN";
-  borrowedDate: Date;
+  borrowedDate: string;
   returnDate: string | null;
   dueDate: string;
+}
+
+export interface TableUser {
+  id: string;
+  info: {
+    name: string;
+    email: string;
+  };
+  universityId: number;
+  universityCard: string;
+  role: "USER" | "ADMIN";
+  universityCard: string;
+  dateJoined: string;
+  booksBorrowed: number;
+}
+export interface AccountRequests {
+  id: string;
+  info: {
+    name: string;
+    email: string;
+  };
+  universityId: number;
+  universityCard: string;
+  status: "APPROVED" | "PENDING" | "REJECTED";
+  universityCard: string;
+  dateJoined: string;
 }

@@ -134,7 +134,7 @@ export async function generateReceipt(borrowRecord: any) {
       await db
         .select()
         .from(books)
-        .where(eq(books.id, borrowRecord.bookId))
+        .where(eq(books.id, borrowRecord.bookInfo.id))
         .limit(1)
     )[0];
     const borrowData = {
@@ -142,7 +142,7 @@ export async function generateReceipt(borrowRecord: any) {
       bookTitle: bookDetails.title,
       author: bookDetails.author,
       genre: bookDetails.genre,
-      borrowDate: new Date(borrowRecord.borrowDate),
+      borrowDate: new Date(borrowRecord.borrowedDate),
       dueDate: new Date(borrowRecord.dueDate),
       duration: 7,
     };

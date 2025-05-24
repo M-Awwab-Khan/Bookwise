@@ -76,6 +76,10 @@ export const updateBorrowStatus = async (
   }
 
   revalidatePath("/admin/borrow-records");
+  return {
+    success: true,
+    message: `Borrow record status updated to ${status}`,
+  };
 };
 
 export const fetchAccountRequests = async () => {
