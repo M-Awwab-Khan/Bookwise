@@ -2,15 +2,13 @@ import BookCard from "@/components/BookCard";
 import BookCover from "@/components/BookCover";
 import BookVideo from "@/components/BookVideo";
 import { Button } from "@/components/ui/button";
-import { db } from "@/database/drizzle";
-import { books } from "@/database/schema";
 import { darkenColor, hexToHSL, increaseLightness } from "@/lib/utils";
-import { eq } from "drizzle-orm";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React from "react";
+import { fetchBookById } from "@/lib/admin/actions/book-details";
 
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   try {
@@ -20,14 +18,12 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
       return redirect("/admin/books");
     }
 
-    const res = await db.select().from(books).where(eq(books.id, id)).limit(1);
+    const book = await fetchBookById(id);
 
-    if (res.length === 0) {
-      console.error(`No book found with ID: ${id}`);
+    if (!book) {
+      console.error("Book not found for ID:", id);
       return redirect("/admin/books");
     }
-
-    const book = res[0];
 
     return (
       <>

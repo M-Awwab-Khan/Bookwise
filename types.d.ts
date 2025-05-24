@@ -71,3 +71,22 @@ declare module "next-auth/jwt" {
     role?: string;
   }
 }
+
+export interface BookRequests {
+  id: string;
+  bookInfo: {
+    coverUrl: string;
+    coverColor: string;
+    title: string;
+    genre?: string;
+    author?: string;
+  };
+  userInfo: {
+    name: string;
+    email: string;
+  };
+  status: "BORROWED" | "RETURNED" | "LATE RETURN";
+  borrowedDate: Date;
+  returnDate: string | null;
+  dueDate: string;
+}
