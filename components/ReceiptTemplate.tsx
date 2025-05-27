@@ -218,12 +218,14 @@ export function ReceiptTemplate({
             <View style={styles.gridItem}>
               <Text style={styles.label}>Borrowed on</Text>
               <Text style={styles.value}>
-                {format(borrowDate, "dd/MM/yyyy")}
+                {format(new Date(borrowDate), "dd/MM/yyyy")}
               </Text>
             </View>
             <View style={styles.gridItem}>
               <Text style={styles.label}>Due Date</Text>
-              <Text style={styles.value}>{format(dueDate, "dd/MM/yyyy")}</Text>
+              <Text style={styles.value}>
+                {format(new Date(dueDate), "dd/MM/yyyy")}
+              </Text>
             </View>
             <View style={styles.gridItem}>
               <Text style={styles.label}>Duration</Text>

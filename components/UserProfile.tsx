@@ -10,9 +10,9 @@ const UserProfile = ({
   universityCard,
   status,
   role,
-}: User) => {
+}: Partial<User>) => {
   return (
-    <div className="space-y-9 w-full md:min-w-[450px] max-w-[700px] h-fit p-10 pt-24 bg-gradient-to-b from-[#232839] to-[#12141D] rounded-[20px] relative">
+    <div className="space-y-9 w-full max-w-full h-fit p-6 md:p-10 pt-16 md:pt-24 bg-gradient-to-b from-[#232839] to-[#12141D] rounded-[20px] relative">
       <Image
         src="/icons/clip.svg"
         alt="clip"
@@ -50,7 +50,7 @@ const UserProfile = ({
             <section className="space-y-2">
               <h4 className="text-white font-semibold text-2xl">
                 {/* Pick only the first and last name */}
-                {fullName.split(" ").slice(0, 2).join(" ")}
+                {fullName && fullName.split(" ").slice(0, 2).join(" ")}
               </h4>
               <p className="text-lg">{email}</p>
             </section>
@@ -66,7 +66,7 @@ const UserProfile = ({
           <p className="font-semibold text-2xl">{universityId}</p>
         </section>
       </div>
-      <Profile universityCard={universityCard} />
+      <Profile universityCard={universityCard as string} />
     </div>
   );
 };

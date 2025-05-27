@@ -11,6 +11,7 @@ import { redirect } from "next/navigation";
 import { workflowClient } from "../workflows";
 import { config } from "../config";
 import { signOut } from "@/auth";
+import { AuthCredentials } from "@/types";
 
 export const signInWithCredentials = async (
   params: Pick<AuthCredentials, "email" | "password">
@@ -82,4 +83,18 @@ export const signUp = async (params: AuthCredentials) => {
 export const logout = async () => {
   await signOut();
   return redirect("/");
+};
+
+export const getUser = async (userId: string) => {
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (user.length === 0) {
+    return null;
+  }
+
+  return user[0];
 };

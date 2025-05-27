@@ -1,7 +1,12 @@
 "use server";
 
 import { db } from "@/database/drizzle";
-import { books, borrowRecords, interactions } from "@/database/schema";
+import {
+  books,
+  borrowRecords,
+  interactions,
+  userCfRecs,
+} from "@/database/schema";
 import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import dayjs from "dayjs";
 import { renderToBuffer } from "@react-pdf/renderer";
@@ -9,6 +14,7 @@ import { ReceiptTemplate } from "@/components/ReceiptTemplate";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 import { BorrowBookParams } from "@/types";
+import redis from "@/database/redis";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -34,12 +40,15 @@ export const borrowBook = async (params: BorrowBookParams) => {
 
     const dueDate = dayjs().add(7, "day").toDate().toDateString();
 
-    const record = await db.insert(borrowRecords).values({
-      userId,
-      bookId,
-      dueDate,
-      status: "BORROWED",
-    });
+    const record = await db
+      .insert(borrowRecords)
+      .values({
+        userId,
+        bookId,
+        dueDate,
+        status: "BORROWED",
+      })
+      .returning();
 
     await db
       .update(books)
@@ -47,11 +56,19 @@ export const borrowBook = async (params: BorrowBookParams) => {
       .where(eq(books.id, bookId));
 
     // interaction
-    await db.insert(interactions).values({
+    // await db.insert(interactions).values({
+    //   userId,
+    //   bookId,
+    //   type: "BORROW",
+    // });
+
+    const interaction = {
       userId,
       bookId,
       type: "BORROW",
-    });
+      timestamp: new Date().toISOString(),
+    };
+    await redis.xadd("interactions", "*", interaction);
 
     return {
       success: true,
@@ -130,11 +147,12 @@ export const hasUserBorrowedBook = async (userId: string, bookId: string) => {
 export async function generateReceipt(borrowRecord: any) {
   try {
     // In a real app, you would fetch this data from your database
+    console.log("Generating receipt for borrow record:", borrowRecord);
     const bookDetails = (
       await db
         .select()
         .from(books)
-        .where(eq(books.id, borrowRecord.bookInfo.id))
+        .where(eq(books.id, borrowRecord?.bookInfo?.id || borrowRecord?.bookId))
         .limit(1)
     )[0];
     const borrowData = {
@@ -142,7 +160,9 @@ export async function generateReceipt(borrowRecord: any) {
       bookTitle: bookDetails.title,
       author: bookDetails.author,
       genre: bookDetails.genre,
-      borrowDate: new Date(borrowRecord.borrowedDate),
+      borrowDate: new Date(
+        borrowRecord.borrowedDate || borrowRecord.borrowDate
+      ),
       dueDate: new Date(borrowRecord.dueDate),
       duration: 7,
     };
@@ -410,11 +430,13 @@ export const updateBookmarkStatus = async (bookId: string, userId: string) => {
           )
         );
     } else {
-      await db.insert(interactions).values({
+      const interaction = {
         userId,
         bookId,
         type: "FAVORITE",
-      });
+        timestamp: new Date().toISOString(),
+      };
+      await redis.xadd("interactions", "*", interaction);
     }
 
     return !bookmarkExists;
@@ -425,13 +447,37 @@ export const updateBookmarkStatus = async (bookId: string, userId: string) => {
 };
 
 export const viewBookInteraction = async (userId: string, bookId: string) => {
+  const interaction = {
+    userId,
+    bookId,
+    type: "VIEW",
+    timestamp: new Date().toISOString(),
+  };
+  await redis.xadd("interactions", "*", interaction);
+};
+
+export const getRecommendedBooks = async (userId: string) => {
   try {
-    await db.insert(interactions).values({
-      userId,
-      bookId,
-      type: "VIEW",
-    });
+    const recommendationIds = await db
+      .select()
+      .from(userCfRecs)
+      .where(eq(userCfRecs.userId, userId))
+      .limit(1);
+
+    if (recommendationIds[0].recs?.length === 0) {
+      return [];
+    }
+
+    const bookIds = recommendationIds[0].recs as string[];
+
+    const recommendedBooks = await db
+      .select()
+      .from(books)
+      .where(sql`${books.id} IN (${sql.join(bookIds, sql`, `)})`);
+
+    return JSON.parse(JSON.stringify(recommendedBooks));
   } catch (error) {
-    console.error("Error logging view interaction:", error);
+    console.error("Error fetching recommended books:", error);
+    return [];
   }
 };

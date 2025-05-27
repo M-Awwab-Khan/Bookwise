@@ -1,9 +1,9 @@
-import React from 'react';
-import Image from 'next/image';
-import BookCover from './BookCover';
-import Link from 'next/link';
-import { darkenColor } from '@/lib/utils';
-import DueDate from './DueDate';
+import React from "react";
+import Image from "next/image";
+import BookCover from "./BookCover";
+import Link from "next/link";
+import { darkenColor } from "@/lib/utils";
+import DueDate from "./DueDate";
 
 interface Props {
   id: string;
@@ -25,7 +25,7 @@ const BorrowedBook = ({
   createdAt,
 }: Props) => {
   return (
-    <li className="bg-dark-500 p-5 pt-0 m-0 rounded-2xl relative">
+    <li className="bg-dark-500 p-5 pt-0 m-0 rounded-2xl relative max-w-[350px]">
       <Link href={`/books/${id}`} className="space-y-5">
         <div
           className="px-6 py-12 flex justify-center items-center rounded-md w-60"

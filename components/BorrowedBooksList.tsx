@@ -1,9 +1,9 @@
-import { auth } from '@/auth';
-import { db } from '@/database/drizzle';
-import { books, borrowRecords } from '@/database/schema';
-import { eq } from 'drizzle-orm';
-import React from 'react';
-import BorrowedBook from './BorrowedBook';
+import { auth } from "@/auth";
+import { db } from "@/database/drizzle";
+import { books, borrowRecords } from "@/database/schema";
+import { eq } from "drizzle-orm";
+import React from "react";
+import BorrowedBooksClient from "./BorrowedBooksClient";
 
 const BorrowedBooksList = async () => {
   const session = await auth();
@@ -18,33 +18,7 @@ const BorrowedBooksList = async () => {
 
   if (borrowedBooks.length < 1) return;
 
-  return (
-    <div>
-      <h2 className="font-bebas-neue text-4xl text-light-100 my-6">
-        Borrowed Books
-      </h2>
-
-      <div className="flex flex-wrap gap-8 mt-6">
-        {borrowedBooks.map(
-          ({
-            borrow_records: { createdAt, dueDate },
-            books: { id, coverUrl, coverColor, title, genre },
-          }) => (
-            <BorrowedBook
-              key={id}
-              id={id}
-              coverColor={coverColor}
-              coverUrl={coverUrl}
-              title={title}
-              genre={genre}
-              createdAt={createdAt as Date}
-              dueDate={dueDate}
-            />
-          ),
-        )}
-      </div>
-    </div>
-  );
+  return <BorrowedBooksClient borrowedBooks={borrowedBooks} />;
 };
 
 export default BorrowedBooksList;
